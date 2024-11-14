@@ -11,7 +11,7 @@ PORT=$(shuf -i 5432-6000 -n 1)
 # Print the credentials for reference
 echo "Starting PostgreSQL Docker container with:"
 echo "Database Name: $DB_NAME"
-echo "Username: $DB_USER"
+echo "Username: $DB_USER (Superuser)"
 echo "Password: $DB_PASS"
 echo "Port: $PORT"
 
@@ -47,3 +47,7 @@ echo "$PGPASS_ENTRY" >> "$PGPASS_PATH"
 echo "Credentials added to ~/.pgpass"
 echo "To connect: psql -h localhost -p $PORT -U $DB_USER -d $DB_NAME"
 echo "Password stored in ~/.pgpass"
+
+# Verify superuser status
+echo "Verifying superuser status..."
+docker exec postgres_$DB_NAME psql -U $DB_USER -d $DB_NAME -c "SELECT usesuper FROM pg_user WHERE usename = current_user;" | grep -q t && echo "User $DB_USER is confirmed as a superuser." || echo "Warning: $DB_USER is not a superuser."
